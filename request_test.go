@@ -30,3 +30,40 @@ func TestRequestCanteenByID(t *testing.T) {
 		t.Errorf("This canteen with ID %d should not exist!", id)
 	}
 }
+
+func TestRequestDatesOfCanteens(t *testing.T) {
+	canteenDates := requestDatesOfCanteen(31, "", 0, 0)
+	if canteenDates == nil {
+		t.Error("NIL returned, could not get valid dates of canteens 1")
+	} else if len(canteenDates) == 0 {
+		fmt.Println("Got an empty list of canteen dates! 1")
+	}
+
+	canteenDates = requestDatesOfCanteen(31, "", 3, 0)
+	if canteenDates == nil {
+		t.Error("NIL returned, could not get valid dates of canteens 2")
+	} else if len(canteenDates) == 0 {
+		fmt.Println("Got an empty list of canteen dates! 2")
+	}
+
+	canteenDates = requestDatesOfCanteen(31, "", 0, 3)
+	if canteenDates == nil {
+		t.Error("NIL returned, could not get valid dates of canteens 3")
+	} else if len(canteenDates) == 0 {
+		fmt.Println("Got an empty list of canteen dates! 3")
+	}
+
+	canteenDates = requestDatesOfCanteen(31, "2020-02-13", 3, 3)
+	if canteenDates == nil {
+		t.Error("NIL returned, could not get valid dates of canteens 4")
+	} else if len(canteenDates) == 0 {
+		fmt.Println("Got an empty list of canteen dates! 4")
+	}
+
+	canteenDates = requestDatesOfCanteen(321, "2020-02-13", 3, 3)
+	if canteenDates == nil {
+		t.Error("NIL returned, could not get valid dates of canteens 5")
+	} else if len(canteenDates) == 0 {
+		fmt.Println("Got an empty list of canteen dates! 5")
+	}
+}
