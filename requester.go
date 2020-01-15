@@ -19,6 +19,42 @@ type Canteen struct {
 	Address string `json:"address"`
 }
 
+//RequestCanteenByID makes a get request for retrieving a single Canteen by its ID
+func RequestCanteenByID(ID uint32) *Canteen {
+	baseURL, err := url.Parse(openMensaEndpoint)
+	if err != nil {
+		log.Println("ERROR: Malformed URL ", err.Error())
+		return nil
+	}
+
+	// Add a Path Segment (Path segment is automatically escaped)
+	baseURL.Path += "/canteens"
+	baseURL.Path += "/" + strconv.Itoa(int(ID))
+
+	resp, err := http.Get(baseURL.String())
+	if err != nil {
+		log.Println("ERROR: Something went wrong when requesting a list of all canteens!", err.Error())
+		return nil
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("ERROR: Something went wrong when processing the result of requesting a list of all canteens!", err.Error())
+		return nil
+	}
+
+	canteen := &Canteen{}
+	err = json.Unmarshal(body, canteen)
+	if err != nil {
+		log.Println("ERROR: Something went wrong when trying to parse the requestcanteen result!", err.Error())
+		return nil
+	}
+
+	return canteen
+}
+
 //RequestListOfAllCanteens request all canteens from all api pages and return a list of all
 func RequestListOfAllCanteens() []Canteen {
 	//currently there are more than 496 canteens, so we can allocate some memory before appending the slices -> Im not gonna update this value in the future
