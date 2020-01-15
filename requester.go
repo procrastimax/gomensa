@@ -37,6 +37,33 @@ type CanteenDate struct {
 	Closed bool   `json:"closed"`
 }
 
+//RequestCanteenDateTomorrow calls the requestDatesOfCanteen function with the limit = 1, a page = 2 and no startDate, so we retrieve the canteen date of tomorrow
+func RequestCanteenDateTomorrow(ID uint32) *CanteenDate {
+	canteenDay := requestDatesOfCanteen(ID, "", 2, 1)
+	if canteenDay == nil {
+		return &CanteenDate{}
+	}
+	return &canteenDay[0]
+}
+
+//RequestCanteenDateToday calls the requestDatesOfCanteen function with the limit of 1 and no startDate, so we retrieve the current date as a canteen date
+func RequestCanteenDateToday(ID uint32) *CanteenDate {
+	canteenDay := requestDatesOfCanteen(ID, "", 0, 1)
+	if canteenDay == nil {
+		return &CanteenDate{}
+	}
+	return &canteenDay[0]
+}
+
+//RequestCanteenWeek calls the requestDatesOfCanteen function with the limit of 7 and no startDate, so we retrieve the next 7 days of a canteen
+func RequestCanteenWeek(ID uint32) []CanteenDate {
+	canteenWeek := requestDatesOfCanteen(ID, "", 0, 7)
+	if canteenWeek == nil {
+		return []CanteenDate{}
+	}
+	return canteenWeek
+}
+
 //requestDatesOfCanteen requests Dates of canteens returning a list of CanteenDate for representing open/ closed dates of the canteen
 //it is advised to expect that the returned list of dates can be empty, this is the case when to date information is given
 //this function needs an ID, a startDate in the form YYYY-MM-DD for specifiyng a startDate for requesting, when passing an unvalid format or empty string the current date is used

@@ -67,3 +67,29 @@ func TestRequestDatesOfCanteens(t *testing.T) {
 		fmt.Println("Got an empty list of canteen dates! 5")
 	}
 }
+
+func TestVariousCanteenDates(t *testing.T) {
+	canteenWeek := RequestCanteenWeek(32)
+
+	if len(canteenWeek) == 0 {
+		t.Error("Something went wrong, we sould definetly retrieve a week of canteen dates here!")
+	} else {
+		fmt.Println(canteenWeek)
+	}
+
+	canteenDay := RequestCanteenDateToday(32)
+
+	if len(canteenDay.Date) == 0 {
+		t.Error("Something went wrong, we sould definetly retrieve a canteenDate for today!")
+	} else {
+		fmt.Println(*canteenDay)
+	}
+
+	canteenDay = RequestCanteenDateTomorrow(32)
+
+	if len(canteenDay.Date) == 0 {
+		t.Error("Something went wrong, we sould definetly retrieve a canteenDate for tomorrow!")
+	} else {
+		fmt.Println(*canteenDay)
+	}
+}
