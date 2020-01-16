@@ -2,12 +2,14 @@ package requests
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -344,6 +346,13 @@ func requestCanteens(page int, canteensChan chan<- []Canteen) {
 		close(canteensChan)
 	}
 
+	//cleaning random new lines
+	for i := range canteens {
+		canteens[i].Name = strings.ReplaceAll(canteens[i].Name, "\n", "")
+		canteens[i].City = strings.ReplaceAll(canteens[i].City, "\n", "")
+		canteens[i].Address = strings.ReplaceAll(canteens[i].Address, "\n", "")
+	}
+
 	canteensChan <- canteens
 
 	// check if the next page would be the last page and then closes the channel
@@ -356,4 +365,47 @@ func requestCanteens(page int, canteensChan chan<- []Canteen) {
 	if page+1 > maxPages {
 		close(canteensChan)
 	}
+}
+
+// some prettify functions
+
+//CanteenToString returns a human readable string for a single canteen instance
+func CanteenToString(canteen *Canteen, multiLine bool) string {
+	if multiLine {
+		return fmt.Sprintf("ID: %d\nName: %s\nCity: %s\nAddress: %s", canteen.ID, canteen.Name, canteen.City, canteen.Address)
+	}
+	return fmt.Sprintf("ID: %d\tName: %s\tCity: %s\tAddress: %s", canteen.ID, canteen.Name, canteen.City, canteen.Address)
+}
+
+//CanteenListToString returns a human readable string for a list of canteens
+func CanteenListToString(canteens []Canteen) string {
+	builder := strings.Builder{}
+	for _, canteen := range canteens {
+		builder.WriteString(CanteenToString(&canteen, false) + "\n")
+	}
+	return builder.String()
+}
+
+func priceToString(price prices, multiLine bool) string {
+	if multiLine {
+		return fmt.Sprintf("Prices:\n\tstudent - %.2f€\n\tpupils - %.2f€\n\temployees - %.2f€\n\tothers - %.2f€", price.Students, price.Pupils, price.Employees, price.Others)
+	}
+	return fmt.Sprintf("Prices: student - %.2f€, pupils - %.2f€, employees - %.2f€, others - %.2f€", price.Students, price.Pupils, price.Employees, price.Others)
+}
+
+//CanteenMealToString returns a human readable string for a single canteenmeal instance
+func CanteenMealToString(meal *CanteenMeal, multiLine bool) string {
+	if multiLine {
+		return fmt.Sprintf("Meal: %s\nCategory: %s\nNotes: %s\n%s", meal.Name, meal.Category, meal.Notes, priceToString(meal.Prices, multiLine))
+	}
+	return fmt.Sprintf("Meal: %s\tCategory: %s\tNotes: %s\t%s", meal.Name, meal.Category, meal.Notes, priceToString(meal.Prices, multiLine))
+}
+
+//CanteenMealListToString returns a human readable string for a list if canteenmeals
+func CanteenMealListToString(meals []CanteenMeal) string {
+	builder := strings.Builder{}
+	for i, meal := range meals {
+		builder.WriteString(strconv.Itoa(i+1) + " " + CanteenMealToString(&meal, false) + "\n")
+	}
+	return builder.String()
 }

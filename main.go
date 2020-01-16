@@ -27,20 +27,26 @@ func main() {
 
 	switch {
 	case *printAllCanteens == true:
-		fmt.Println(requests.RequestListOfAllCanteens())
+		fmt.Println(requests.CanteenListToString(requests.RequestListOfAllCanteens()))
 
 	case *getTodayMeal == true:
 		if *canteenID > 0 {
-			fmt.Println(requests.RequestCanteenMealOfToday(uint32(*canteenID)))
+			_, meal := requests.RequestCanteenMealOfToday(uint32(*canteenID))
+			fmt.Println(requests.CanteenMealListToString(meal))
 		} else {
-			fmt.Println(requests.RequestCanteenMealOfToday(uint32(getDefaultCanteenIDFromConfig())))
+			id := getDefaultCanteenIDFromConfig()
+			_, meals := requests.RequestCanteenMealOfToday(uint32(id))
+			fmt.Println(requests.CanteenMealListToString(meals))
 		}
 
 	case *getTomorrowMeal == true:
 		if *canteenID > 0 {
-			fmt.Println(requests.RequestCanteenMealOfTomorrow(uint32(*canteenID)))
+			_, meal := requests.RequestCanteenMealOfTomorrow(uint32(*canteenID))
+			fmt.Println(requests.CanteenMealListToString(meal))
 		} else {
-			fmt.Println(requests.RequestCanteenMealOfTomorrow(uint32(getDefaultCanteenIDFromConfig())))
+			id := getDefaultCanteenIDFromConfig()
+			_, meals := requests.RequestCanteenMealOfTomorrow(uint32(id))
+			fmt.Println(requests.CanteenMealListToString(meals))
 		}
 
 	case *getWeekMeal == true:
