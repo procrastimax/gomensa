@@ -54,26 +54,26 @@ type prices struct {
 }
 
 //RequestCanteenMealOfTomorrow returns all meals that are offered at the given canteen tomorrow
-func RequestCanteenMealOfTomorrow(canteenID uint32) []CanteenMeal {
+func RequestCanteenMealOfTomorrow(canteenID uint32) (*CanteenDate, []CanteenMeal) {
 	canteenDateToday := RequestCanteenDateTomorrow(canteenID)
 
 	if canteenDateToday.Date == "" {
-		return []CanteenMeal{}
+		return &CanteenDate{}, []CanteenMeal{}
 	}
 
 	canteenMeals := requestCanteenMeals(canteenID, canteenDateToday.Date)
 	if canteenMeals == nil {
-		return []CanteenMeal{}
+		return &CanteenDate{}, []CanteenMeal{}
 	}
-	return canteenMeals
+	return canteenDateToday, canteenMeals
 }
 
 //RequestCanteenMealsOfWeek returns all meals of the next 7 days from a given canteen
-func RequestCanteenMealsOfWeek(canteenID uint32) [][]CanteenMeal {
+func RequestCanteenMealsOfWeek(canteenID uint32) ([]CanteenDate, [][]CanteenMeal) {
 	canteenDateList := RequestCanteenWeek(canteenID)
 
 	if len(canteenDateList) == 0 {
-		return [][]CanteenMeal{}
+		return []CanteenDate{}, [][]CanteenMeal{}
 	}
 
 	canteenMealList := make([][]CanteenMeal, len(canteenDateList))
@@ -89,23 +89,23 @@ func RequestCanteenMealsOfWeek(canteenID uint32) [][]CanteenMeal {
 		}
 		canteenMealList[i] = mealList
 	}
-	return canteenMealList
+	return canteenDateList, canteenMealList
 }
 
 //RequestCanteenMealOfToday returns the canteenMeal for the current day
 //this functions makes a requestCanteenDate request to see if the canteen is open and if there is any information provided about the meals
-func RequestCanteenMealOfToday(canteenID uint32) []CanteenMeal {
+func RequestCanteenMealOfToday(canteenID uint32) (*CanteenDate, []CanteenMeal) {
 	canteenDateToday := RequestCanteenDateToday(canteenID)
 	//check if we retrieved an empty instance of the canteenDate
 	if canteenDateToday.Date == "" {
-		return []CanteenMeal{}
+		return &CanteenDate{}, []CanteenMeal{}
 	}
 
 	canteenMeals := requestCanteenMeals(canteenID, canteenDateToday.Date)
 	if canteenMeals == nil {
-		return []CanteenMeal{}
+		return &CanteenDate{}, []CanteenMeal{}
 	}
-	return canteenMeals
+	return canteenDateToday, canteenMeals
 }
 
 //requestCanteenMeals is a function which requests a list of meals for a given canteen with a canteenID and a canteenDate

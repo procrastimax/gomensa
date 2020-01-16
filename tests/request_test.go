@@ -54,17 +54,17 @@ func TestVariousCanteenDates(t *testing.T) {
 }
 
 func TestVariousCanteenMealDates(t *testing.T) {
-	canteenMeals := requests.RequestCanteenMealOfToday(32)
+	_, canteenMeals := requests.RequestCanteenMealOfToday(32)
 	if len(canteenMeals) == 0 {
 		t.Error("Could not retrieve the meals for today!")
 	}
 
-	canteenMeals = requests.RequestCanteenMealOfTomorrow(32)
+	_, canteenMeals = requests.RequestCanteenMealOfTomorrow(32)
 	if len(canteenMeals) == 0 {
 		t.Error("Could not retrieve the meals for tomorrow!")
 	}
 
-	canteenWeekMeals := requests.RequestCanteenMealsOfWeek(32)
+	_, canteenWeekMeals := requests.RequestCanteenMealsOfWeek(32)
 	if len(canteenWeekMeals) == 0 {
 		t.Error("Could not retrieve the meals for week!")
 	}
