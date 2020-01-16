@@ -37,6 +37,112 @@ type CanteenDate struct {
 	Closed bool   `json:"closed"`
 }
 
+//CanteenMeal is a struct representing a single meal of a canteen
+type CanteenMeal struct {
+	ID       int      `json:"id"`
+	Name     string   `json:"name"`
+	Notes    []string `json:"notes"`
+	Prices   prices   `json:"prices"`
+	Category string   `json:"category"`
+}
+
+type prices struct {
+	Students  float64 `json:"students"`
+	Employees float64 `json:"employees"`
+	Pupils    float64 `json:"pupils"`
+	Others    float64 `json:"others"`
+}
+
+//RequestCanteenMealOfTomorrow returns all meals that are offered at the given canteen tomorrow
+func RequestCanteenMealOfTomorrow(canteenID uint32) []CanteenMeal {
+	canteenDateToday := RequestCanteenDateTomorrow(canteenID)
+
+	if canteenDateToday.Date == "" {
+		return []CanteenMeal{}
+	}
+
+	canteenMeals := requestCanteenMeals(canteenID, canteenDateToday.Date)
+	if canteenMeals == nil {
+		return []CanteenMeal{}
+	}
+	return canteenMeals
+}
+
+//RequestCanteenMealsOfWeek returns all meals of the next 7 days from a given canteen
+func RequestCanteenMealsOfWeek(canteenID uint32) [][]CanteenMeal {
+	canteenDateList := RequestCanteenWeek(canteenID)
+
+	if len(canteenDateList) == 0 {
+		return [][]CanteenMeal{}
+	}
+
+	canteenMealList := make([][]CanteenMeal, len(canteenDateList))
+	mealList := []CanteenMeal{}
+
+	for i, date := range canteenDateList {
+
+		mealList = requestCanteenMeals(canteenID, date.Date)
+
+		if mealList == nil {
+			canteenMealList[i] = nil
+			break
+		}
+		canteenMealList[i] = mealList
+	}
+	return canteenMealList
+}
+
+//RequestCanteenMealOfToday returns the canteenMeal for the current day
+//this functions makes a requestCanteenDate request to see if the canteen is open and if there is any information provided about the meals
+func RequestCanteenMealOfToday(canteenID uint32) []CanteenMeal {
+	canteenDateToday := RequestCanteenDateToday(canteenID)
+	//check if we retrieved an empty instance of the canteenDate
+	if canteenDateToday.Date == "" {
+		return []CanteenMeal{}
+	}
+
+	canteenMeals := requestCanteenMeals(canteenID, canteenDateToday.Date)
+	if canteenMeals == nil {
+		return []CanteenMeal{}
+	}
+	return canteenMeals
+}
+
+//requestCanteenMeals is a function which requests a list of meals for a given canteen with a canteenID and a canteenDate
+func requestCanteenMeals(canteendID uint32, canteenDate string) []CanteenMeal {
+	baseURL, err := url.Parse(openMensaEndpoint)
+	if err != nil {
+		log.Println("ERROR: Malformed URL ", err.Error())
+		return nil
+	}
+
+	// Add a Path Segment (Path segment is automatically escaped)
+	baseURL.Path += "/canteens/" + strconv.Itoa(int(canteendID)) + "/days/" + canteenDate + "/meals"
+
+	resp, err := http.Get(baseURL.String())
+	if err != nil {
+		log.Println("ERROR: Something went wrong when requesting a list of meals!", err.Error())
+		return nil
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("ERROR: Something went wrong when processing the result of requesting a list of all meals for a day!", err.Error())
+		return nil
+	}
+
+	canteenMeals := []CanteenMeal{}
+	err = json.Unmarshal(body, &canteenMeals)
+	if err != nil {
+		log.Println("ERROR: Something went wrong when trying to parse the requestCantenenMeal result!", err.Error())
+		return nil
+	}
+
+	return canteenMeals
+}
+
 //RequestCanteenDateTomorrow calls the requestDatesOfCanteen function with the limit = 1, a page = 2 and no startDate, so we retrieve the canteen date of tomorrow
 func RequestCanteenDateTomorrow(ID uint32) *CanteenDate {
 	canteenDay := requestDatesOfCanteen(ID, "", 2, 1)
@@ -152,8 +258,7 @@ func RequestCanteenByID(ID uint32) *Canteen {
 	}
 
 	// Add a Path Segment (Path segment is automatically escaped)
-	baseURL.Path += "/canteens"
-	baseURL.Path += "/" + strconv.Itoa(int(ID))
+	baseURL.Path += "/canteens/" + strconv.Itoa(int(ID))
 
 	resp, err := http.Get(baseURL.String())
 	if err != nil {

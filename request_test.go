@@ -16,7 +16,6 @@ func TestRequestAllCanteens(t *testing.T) {
 
 func TestRequestCanteenByID(t *testing.T) {
 	canteen := RequestCanteenByID(1)
-
 	if canteen == nil {
 		t.Error("Could not retrieve single canteen by ID!")
 	} else {
@@ -25,7 +24,6 @@ func TestRequestCanteenByID(t *testing.T) {
 
 	id := 6666
 	canteen = RequestCanteenByID(uint32(id))
-
 	if canteen != nil {
 		t.Errorf("This canteen with ID %d should not exist!", id)
 	}
@@ -70,7 +68,6 @@ func TestRequestDatesOfCanteens(t *testing.T) {
 
 func TestVariousCanteenDates(t *testing.T) {
 	canteenWeek := RequestCanteenWeek(32)
-
 	if len(canteenWeek) == 0 {
 		t.Error("Something went wrong, we sould definetly retrieve a week of canteen dates here!")
 	} else {
@@ -78,7 +75,6 @@ func TestVariousCanteenDates(t *testing.T) {
 	}
 
 	canteenDay := RequestCanteenDateToday(32)
-
 	if len(canteenDay.Date) == 0 {
 		t.Error("Something went wrong, we sould definetly retrieve a canteenDate for today!")
 	} else {
@@ -86,10 +82,33 @@ func TestVariousCanteenDates(t *testing.T) {
 	}
 
 	canteenDay = RequestCanteenDateTomorrow(32)
-
 	if len(canteenDay.Date) == 0 {
 		t.Error("Something went wrong, we sould definetly retrieve a canteenDate for tomorrow!")
 	} else {
 		fmt.Println(*canteenDay)
+	}
+}
+
+func TestRequestCanteenMeals(t *testing.T) {
+	canteenMeals := requestCanteenMeals(32, "2020-01-15")
+	if canteenMeals == nil {
+		t.Error("Could not retrieve list of meals!")
+	}
+}
+
+func TestVariousCanteenMealDates(t *testing.T) {
+	canteenMeals := RequestCanteenMealOfToday(32)
+	if len(canteenMeals) == 0 {
+		t.Error("Could not retrieve the meals for today!")
+	}
+
+	canteenMeals = RequestCanteenMealOfTomorrow(32)
+	if len(canteenMeals) == 0 {
+		t.Error("Could not retrieve the meals for tomorrow!")
+	}
+
+	canteenWeekMeals := RequestCanteenMealsOfWeek(32)
+	if len(canteenWeekMeals) == 0 {
+		t.Error("Could not retrieve the meals for week!")
 	}
 }
