@@ -2,7 +2,6 @@ package requests
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -313,6 +312,7 @@ func requestCanteens(page int, canteensChan chan<- []Canteen) {
 	if err != nil {
 		log.Println("ERROR: Malformed URL ", err.Error())
 		close(canteensChan)
+		return
 	}
 
 	// Add a Path Segment (Path segment is automatically escaped)
@@ -329,6 +329,7 @@ func requestCanteens(page int, canteensChan chan<- []Canteen) {
 	if err != nil {
 		log.Println("ERROR: Something went wrong when requesting a list of all canteens!", err.Error())
 		close(canteensChan)
+		return
 	}
 
 	defer resp.Body.Close()
@@ -337,6 +338,7 @@ func requestCanteens(page int, canteensChan chan<- []Canteen) {
 	if err != nil {
 		log.Println("ERROR: Something went wrong when processing the result of requesting a list of all canteens!", err.Error())
 		close(canteensChan)
+		return
 	}
 
 	canteens := []Canteen{}
@@ -344,6 +346,7 @@ func requestCanteens(page int, canteensChan chan<- []Canteen) {
 	if err != nil {
 		log.Println("ERROR: Something went wrong when trying to parse the canteen list results!", err.Error())
 		close(canteensChan)
+		return
 	}
 
 	//cleaning random new lines
@@ -360,52 +363,11 @@ func requestCanteens(page int, canteensChan chan<- []Canteen) {
 	if err != nil {
 		log.Println("ERROR: Could not convert max page header key to int!")
 		close(canteensChan)
+		return
 	}
 
 	if page+1 > maxPages {
 		close(canteensChan)
+		return
 	}
-}
-
-// some prettify functions
-
-//CanteenToString returns a human readable string for a single canteen instance
-func CanteenToString(canteen *Canteen, multiLine bool) string {
-	if multiLine {
-		return fmt.Sprintf("ID: %d\nName: %s\nCity: %s\nAddress: %s", canteen.ID, canteen.Name, canteen.City, canteen.Address)
-	}
-	return fmt.Sprintf("ID: %d\tName: %s\tCity: %s\tAddress: %s", canteen.ID, canteen.Name, canteen.City, canteen.Address)
-}
-
-//CanteenListToString returns a human readable string for a list of canteens
-func CanteenListToString(canteens []Canteen) string {
-	builder := strings.Builder{}
-	for _, canteen := range canteens {
-		builder.WriteString(CanteenToString(&canteen, false) + "\n")
-	}
-	return builder.String()
-}
-
-func priceToString(price prices, multiLine bool) string {
-	if multiLine {
-		return fmt.Sprintf("Prices:\n\tstudent - %.2f€\n\tpupils - %.2f€\n\temployees - %.2f€\n\tothers - %.2f€", price.Students, price.Pupils, price.Employees, price.Others)
-	}
-	return fmt.Sprintf("Prices: student - %.2f€, pupils - %.2f€, employees - %.2f€, others - %.2f€", price.Students, price.Pupils, price.Employees, price.Others)
-}
-
-//CanteenMealToString returns a human readable string for a single canteenmeal instance
-func CanteenMealToString(meal *CanteenMeal, multiLine bool) string {
-	if multiLine {
-		return fmt.Sprintf("Meal: %s\nCategory: %s\nNotes: %s\n%s", meal.Name, meal.Category, meal.Notes, priceToString(meal.Prices, multiLine))
-	}
-	return fmt.Sprintf("Meal: %s\tCategory: %s\tNotes: %s\t%s", meal.Name, meal.Category, meal.Notes, priceToString(meal.Prices, multiLine))
-}
-
-//CanteenMealListToString returns a human readable string for a list if canteenmeals
-func CanteenMealListToString(meals []CanteenMeal) string {
-	builder := strings.Builder{}
-	for i, meal := range meals {
-		builder.WriteString(strconv.Itoa(i+1) + " " + CanteenMealToString(&meal, false) + "\n")
-	}
-	return builder.String()
 }

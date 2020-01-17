@@ -58,20 +58,21 @@ func ReadConfig() *Config {
 	if CheckConfigExists() == false {
 		log.Println("ERROR: Can't read config file because file does not exist!")
 		log.Println("Using empty config file.")
-		return nil
+		SaveConfig(&Config{})
+		return &Config{}
 	}
 
 	configContent, err := ioutil.ReadFile(getUsersHomeDir() + configFilePath + configFileName)
 	if err != nil {
 		log.Println("ERROR: Something went wrong trying to open existing config file!", err.Error())
-		return nil
+		return &Config{}
 	}
 
 	config := &Config{}
 	err = json.Unmarshal(configContent, config)
 	if err != nil {
 		log.Println("ERROR: Something went wrong when trying to parse config file to json object!", err.Error())
-		return nil
+		return &Config{}
 	}
 	return config
 }
