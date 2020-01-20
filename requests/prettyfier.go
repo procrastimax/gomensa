@@ -61,8 +61,9 @@ func CanteenMealToString(meal *CanteenMeal, seperator string, showPrice bool, sh
 }
 
 //CanteenMealListToString returns a human readable string for a list if canteenmeals
-func CanteenMealListToString(meals []CanteenMeal, showPrice, showNotes, showCategory, showOnlyStudent bool) string {
+func CanteenMealListToString(canteenDate CanteenDate, meals []CanteenMeal, showPrice, showNotes, showCategory, showOnlyStudent bool) string {
 	builder := strings.Builder{}
+	builder.WriteString(canteenDate.Date + "\n")
 	for i, meal := range meals {
 		builder.WriteString(strconv.Itoa(i+1) + " " + CanteenMealToString(&meal, "\t", showPrice, showCategory, showNotes, showOnlyStudent) + "\n")
 	}
@@ -74,14 +75,36 @@ func CanteenMealWeekListToString(cateenWeek []CanteenDate, mealweek [][]CanteenM
 	builder := strings.Builder{}
 	for i := range mealweek {
 		if i == 0 {
-			builder.WriteString(fmt.Sprintf("-> %s\n", cateenWeek[i].Date))
+			builder.WriteString("-> " + cateenWeek[i].Date + "\n")
 		} else {
-			builder.WriteString(fmt.Sprintf("\n-> %s\n", cateenWeek[i].Date))
+			builder.WriteString("\n-> " + cateenWeek[i].Date + "\n")
 		}
 
 		for _, meal := range mealweek[i] {
 			builder.WriteString(fmt.Sprintf("\t%s\n", CanteenMealToString(&meal, "\t", showPrice, showCategory, showNotes, showOnlyStudent)))
 		}
+	}
+	return builder.String()
+}
+
+//CanteenDateOpenedToString returns a string date representation of a canteen date with its opening information
+func CanteenDateOpenedToString(canteenDate *CanteenDate) string {
+	builder := strings.Builder{}
+	builder.WriteString(" - " + canteenDate.Date)
+	if canteenDate.Closed {
+		builder.WriteString(" -> closed")
+	} else {
+		builder.WriteString(" -> open")
+	}
+	return builder.String()
+}
+
+//CanteenDateListToString returns a prettified version of a list of canteen dates
+func CanteenDateListToString(canteenDates []CanteenDate) string {
+	builder := strings.Builder{}
+
+	for _, date := range canteenDates {
+		builder.WriteString(CanteenDateOpenedToString(&date) + "\n")
 	}
 	return builder.String()
 }
