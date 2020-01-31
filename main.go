@@ -1,25 +1,250 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"gomensa/configutil"
 	"gomensa/requests"
 	"log"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
+)
+
+var (
+	anyWhiteSpaceRegex = regexp.MustCompile("\\s+")
 )
 
 func main() {
+	//check if program parameters are specified, if not , then start the program in 'interactive mode'
 	if len(os.Args) == 1 {
-		fmt.Println("GoMensa - your easy and friendly mensa helper!")
+		fmt.Println("\t----- GoMensa - your easy mensa helper! -----")
 		handleProgramLoop()
 	} else {
 		handleProgramFlags()
 	}
 }
 
+func printMenu() {
+	fmt.Println("Commands:")
+	fmt.Println("\t-> help")
+	fmt.Println("\t-> quit")
+	fmt.Println("\t-> clear")
+	fmt.Println("\t-> listMensas")
+	fmt.Println("\t-> setDefault (mensaID)")
+	fmt.Println("\t-> showMensa [mensaID]")
+	fmt.Println("\t-> mealToday [mensaID]")
+	fmt.Println("\t-> mealTomorrow [mensaID]")
+	fmt.Println("\t-> mealWeek [mensaID]")
+	fmt.Println("\t-> openingStatus [mensaID] [YYYY-MM-DD]")
+	fmt.Println("\t values in [] are optional, values in () are needed!")
+}
+
+//handleProgramLoop is the interactive mode program logic
+// runs until user quits
 func handleProgramLoop() {
-	fmt.Println("program loop started")
+	printMenu()
+	var userCommand string = ""
+	input := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Print("> ")
+		ok := input.Scan()
+		if ok == false {
+			break
+		}
+
+		userCommand = input.Text()
+
+		switch {
+		case userCommand == "quit", userCommand == "exit", userCommand == "q":
+			return
+		case userCommand == "help":
+			fmt.Println()
+			printMenu()
+		case userCommand == "clear":
+			fmt.Println("\033[H\033[2J")
+		case userCommand == "listMensas":
+			fmt.Println(requests.CanteenListToString(requests.RequestListOfAllCanteens()))
+		case strings.Contains(userCommand, "setDefault"):
+			splitArr := anyWhiteSpaceRegex.Split(userCommand, -1)
+			if len(splitArr) != 2 {
+				fmt.Println("Could not read the needed mensa ID to set your default mensa!")
+				break
+			}
+			mensaID, err := strconv.Atoi(splitArr[1])
+			if err != nil {
+				fmt.Println("Could not read the needed mensa ID to set your default mensa!")
+				break
+			}
+			setDefaultCanteen(mensaID)
+		case strings.Contains(userCommand, "showMensa"):
+			splitArr := anyWhiteSpaceRegex.Split(userCommand, -1)
+
+			//user did not specify any ID, try to use default
+			if len(splitArr) == 1 {
+				mensa := configutil.ReadConfig().Canteen
+
+				if mensa.ID != 0 {
+					fmt.Println(requests.CanteenToString(&mensa))
+				} else {
+					fmt.Println("No mensaID was given and there don't seem to be a default mensa.")
+					break
+				}
+			} else {
+				mensaID, err := strconv.Atoi(splitArr[1])
+				if err != nil {
+					fmt.Println("Could not read mensaID! Please use the following format: showMensa [mensaID]. Where mensaID is a normal positive number.")
+				}
+				fmt.Println(requests.CanteenToString(requests.RequestCanteenByID(uint32(mensaID))))
+			}
+
+		case strings.Contains(userCommand, "mealToday"):
+			splitArr := anyWhiteSpaceRegex.Split(userCommand, -1)
+
+			//user did not specify any ID, try to use default
+			if len(splitArr) == 1 {
+				mensa := configutil.ReadConfig().Canteen
+
+				if mensa.ID != 0 {
+					date, meals := requests.RequestCanteenMealOfToday(uint32(mensa.ID))
+					fmt.Println(requests.CanteenMealListToString(*date, meals, &mensa, true, true, true, true, true, true, true))
+				} else {
+					fmt.Println("No mensaID was given and there don't seem to be a default mensa.")
+					break
+				}
+			} else {
+				mensaID, err := strconv.Atoi(splitArr[1])
+				if err != nil {
+					fmt.Println("Could not read mensaID! Please use the following format: showMensa [mensaID]. Where mensaID is a normal positive number.")
+				}
+				mensa := requests.RequestCanteenByID(uint32(mensaID))
+				date, meals := requests.RequestCanteenMealOfToday(uint32(mensaID))
+				fmt.Println(requests.CanteenMealListToString(*date, meals, mensa, true, true, true, true, true, true, true))
+			}
+		case strings.Contains(userCommand, "mealTomorrow"):
+			splitArr := anyWhiteSpaceRegex.Split(userCommand, -1)
+
+			//user did not specify any ID, try to use default
+			if len(splitArr) == 1 {
+				mensa := configutil.ReadConfig().Canteen
+
+				if mensa.ID != 0 {
+					date, meals := requests.RequestCanteenMealOfTomorrow(uint32(mensa.ID))
+					fmt.Println(requests.CanteenMealListToString(*date, meals, &mensa, true, true, true, true, true, true, true))
+				} else {
+					fmt.Println("No mensaID was given and there don't seem to be a default mensa.")
+					break
+				}
+			} else {
+				mensaID, err := strconv.Atoi(splitArr[1])
+				if err != nil {
+					fmt.Println("Could not read mensaID! Please use the following format: showMensa [mensaID]. Where mensaID is a normal positive number.")
+				}
+				mensa := requests.RequestCanteenByID(uint32(mensaID))
+				date, meals := requests.RequestCanteenMealOfTomorrow(uint32(mensaID))
+				fmt.Println(requests.CanteenMealListToString(*date, meals, mensa, true, true, true, true, true, true, true))
+			}
+		case strings.Contains(userCommand, "mealWeek"):
+			splitArr := anyWhiteSpaceRegex.Split(userCommand, -1)
+
+			//user did not specify any ID, try to use default
+			if len(splitArr) == 1 {
+				mensa := configutil.ReadConfig().Canteen
+
+				if mensa.ID != 0 {
+					dates, meals := requests.RequestCanteenMealsOfWeek(uint32(mensa.ID))
+					fmt.Println(requests.CanteenMealWeekListToString(dates, meals, &mensa, true, true, true, true, true, true, true))
+				} else {
+					fmt.Println("No mensaID was given and there don't seem to be a default mensa.")
+					break
+				}
+			} else {
+				mensaID, err := strconv.Atoi(splitArr[1])
+				if err != nil {
+					fmt.Println("Could not read mensaID! Please use the following format: showMensa [mensaID]. Where mensaID is a normal positive number.")
+				}
+				mensa := requests.RequestCanteenByID(uint32(mensaID))
+				dates, meals := requests.RequestCanteenMealsOfWeek(uint32(mensaID))
+				fmt.Println(requests.CanteenMealWeekListToString(dates, meals, mensa, true, true, true, true, true, true, true))
+			}
+		case strings.Contains(userCommand, "openingStatus"):
+			splitArr := anyWhiteSpaceRegex.Split(userCommand, -1)
+
+			// user did not specify a date nor a mensaID, use default
+			if len(splitArr) == 1 {
+				mensa := configutil.ReadConfig().Canteen
+
+				if mensa.ID != 0 {
+					date, _ := requests.RequestCanteenDateToday(uint32(mensa.ID))
+					fmt.Println(requests.CanteenDateOpenedToString(date, mensa.Name, false))
+					break
+				} else {
+					fmt.Println("No mensaID was given and there don't seem to be a default mensa.")
+					break
+				}
+			}
+
+			//user did not specify any ID or no date, try to use default
+			if len(splitArr) < 3 {
+				dateStr := ""
+				//test if the parameter is the mensaID, if not use the date and use default mensaID
+				mensaID, err := strconv.Atoi(splitArr[1])
+				if err != nil {
+					dateStr = splitArr[1]
+					mensa := configutil.ReadConfig().Canteen
+
+					if mensa.ID != 0 {
+						fmt.Println(dateStr)
+						date, _ := requests.RequestCanteenDate(uint32(mensa.ID), dateStr)
+						fmt.Println(requests.CanteenDateOpenedToString(date, mensa.Name, false))
+						break
+					} else {
+						fmt.Println("No mensaID was given and there don't seem to be a default mensa.")
+						break
+					}
+					//mensaID was given, but no date, so use cantenDate from today
+				} else {
+					date, _ := requests.RequestCanteenDateToday(uint32(mensaID))
+					mensa := requests.RequestCanteenByID(uint32(mensaID))
+					fmt.Println(requests.CanteenDateOpenedToString(date, mensa.Name, false))
+					break
+				}
+			}
+
+			//user did specify proper format
+			if len(splitArr) == 3 {
+				mensaID, err := strconv.Atoi(splitArr[1])
+				dateStr := splitArr[2]
+
+				//not valid mensaID
+				if err != nil {
+					mensa := configutil.ReadConfig().Canteen
+
+					if mensa.ID != 0 {
+						date, _ := requests.RequestCanteenDate(uint32(mensa.ID), dateStr)
+						fmt.Println(requests.CanteenDateOpenedToString(date, mensa.Name, false))
+						break
+					} else {
+						fmt.Println("No mensaID was given and there don't seem to be a default mensa.")
+						break
+					}
+					//valid mensaID
+				} else {
+					date, _ := requests.RequestCanteenDate(uint32(mensaID), dateStr)
+					mensa := requests.RequestCanteenByID(uint32(mensaID))
+					fmt.Println(requests.CanteenDateOpenedToString(date, mensa.Name, false))
+					break
+				}
+			}
+			fmt.Println("Invalid format! Please use: openingStatus [mensaID] [YYYY-MM-DD]")
+		default:
+			fmt.Println("\nUnknown command :(")
+			printMenu()
+		}
+
+	}
 }
 
 func handleProgramFlags() {
