@@ -84,7 +84,7 @@ func handleProgramFlags() {
 
 	case *printDefaultCanteen == true:
 		defaultCanteenID := &configutil.ReadConfig().Canteen
-		fmt.Println(requests.CanteenToString(defaultCanteenID, true))
+		fmt.Println(requests.CanteenToString(defaultCanteenID))
 
 	case *getTodayMeal == true:
 		date, meals := requests.RequestCanteenMealOfToday(uint32(canteenID))
@@ -97,9 +97,6 @@ func handleProgramFlags() {
 	case *getWeekMeal == true:
 		canteenWeek, canteenMealWeek := requests.RequestCanteenMealsOfWeek(uint32(canteenID))
 		fmt.Println(requests.CanteenMealWeekListToString(canteenWeek, canteenMealWeek, *showPrice, *showNotes, *showCategory, *showOnlyStudent))
-
-	/*case *canteenIDParam > 0:
-	fmt.Println(requests.RequestCanteenByID(uint32(canteenID)))*/
 
 	case *defaultCanteen > 0:
 		setDefaultCanteen(*defaultCanteen)

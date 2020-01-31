@@ -7,18 +7,24 @@ import (
 )
 
 //CanteenToString returns a human readable string for a single canteen instance
-func CanteenToString(canteen *Canteen, multiLine bool) string {
-	if multiLine {
-		return fmt.Sprintf("ID: %d\nName: %s\nCity: %s\nAddress: %s", canteen.ID, canteen.Name, canteen.City, canteen.Address)
-	}
-	return fmt.Sprintf("ID: %d\tName: %s\tCity: %s\tAddress: %s", canteen.ID, canteen.Name, canteen.City, canteen.Address)
+func CanteenToString(canteen *Canteen) string {
+	return fmt.Sprintf("\tID: %d\n\tName: %s\n\tCity: %s\n\tAddress: %s\n", canteen.ID, canteen.Name, canteen.City, canteen.Address)
 }
 
 //CanteenListToString returns a human readable string for a list of canteens
 func CanteenListToString(canteens []Canteen) string {
 	builder := strings.Builder{}
 	for _, canteen := range canteens {
-		builder.WriteString(CanteenToString(&canteen, false) + "\n")
+		builder.WriteString(CanteenToString(&canteen))
+	}
+	return builder.String()
+}
+
+func notesToString(notes []string) string {
+	builder := strings.Builder{}
+
+	for _, note := range notes {
+		builder.WriteString(fmt.Sprintf("\t\t- %s\n", note))
 	}
 	return builder.String()
 }
@@ -26,16 +32,16 @@ func CanteenListToString(canteens []Canteen) string {
 func priceToString(price prices, showOnlyStudent bool, seperator string) string {
 	builder := strings.Builder{}
 	if showOnlyStudent == true {
-		builder.WriteString("Price: ")
-		builder.WriteString(fmt.Sprintf("students %0.2f€", price.Students))
+		builder.WriteString("Price:\n")
+		builder.WriteString(fmt.Sprintf("\t\t- students: %0.2f€", price.Students))
 		return builder.String()
 	}
 
-	builder.WriteString("Prices: ")
-	builder.WriteString(fmt.Sprintf("students %0.2f€,%s", price.Students, seperator))
-	builder.WriteString(fmt.Sprintf("pupils %0.2f€,%s", price.Pupils, seperator))
-	builder.WriteString(fmt.Sprintf("employees %0.2f€,%s", price.Employees, seperator))
-	builder.WriteString(fmt.Sprintf("others %0.2f€%s", price.Others, seperator))
+	builder.WriteString("Prices:\n")
+	builder.WriteString(fmt.Sprintf("\t\t- students: %0.2f€\n", price.Students))
+	builder.WriteString(fmt.Sprintf("\t\t- pupils: %0.2f€\n", price.Pupils))
+	builder.WriteString(fmt.Sprintf("\t\t- employees: %0.2f€\n", price.Employees))
+	builder.WriteString(fmt.Sprintf("\t\t- others: %0.2f€\n", price.Others))
 	return builder.String()
 }
 
@@ -46,17 +52,18 @@ func CanteenMealToString(meal *CanteenMeal, seperator string, showPrice bool, sh
 	builder.WriteString(fmt.Sprintf("Meal: %s", meal.Name) + seperator)
 
 	if showCategory {
-		builder.WriteString(fmt.Sprintf("Categorie: %s", meal.Category) + seperator)
+		builder.WriteString(fmt.Sprintf("\n\tCategorie: %s", meal.Category) + seperator)
 	}
 
 	if showNotes {
-		builder.WriteString(fmt.Sprintf("Notes: %s", meal.Notes) + seperator)
+		builder.WriteString(fmt.Sprintf("\n\tNotes:\n%s", notesToString(meal.Notes)) + seperator)
 	}
 
 	if showPrice {
 		builder.WriteString(fmt.Sprintf("%s", priceToString(meal.Prices, showOnlyStudent, " ")))
 	}
 
+	builder.WriteString("\n")
 	return builder.String()
 }
 
