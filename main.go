@@ -65,17 +65,19 @@ func handleProgramFlags() {
 	}
 
 	canteenID := -1
+	var canteen *requests.Canteen = &requests.Canteen{}
 
 	//if no canteenID is set then use the one from the config
 	if *canteenIDParam <= 0 {
 		canteenID = configutil.ReadConfig().Canteen.ID
-
+		canteen = &configutil.ReadConfig().Canteen
 		//canteenID is always the n 0 after reading from config, when the config did not exist previously
 		if canteenID == 0 {
 			log.Fatalln("No mensaID was given and no defaultID exist in the config files! Please set either one of them!")
 		}
 	} else {
 		canteenID = *canteenIDParam
+		canteen = requests.RequestCanteenByID(uint32(canteenID))
 	}
 
 	switch {
@@ -83,8 +85,8 @@ func handleProgramFlags() {
 		fmt.Println(requests.CanteenListToString(requests.RequestListOfAllCanteens()))
 
 	case *printDefaultCanteen == true:
-		defaultCanteenID := &configutil.ReadConfig().Canteen
-		fmt.Println(requests.CanteenToString(defaultCanteenID))
+		defaultCanteen := &configutil.ReadConfig().Canteen
+		fmt.Println(requests.CanteenToString(defaultCanteen))
 
 	case *getTodayMeal == true:
 		date, meals := requests.RequestCanteenMealOfToday(uint32(canteenID))
@@ -106,7 +108,7 @@ func handleProgramFlags() {
 		if ok == false {
 			fmt.Println("Could not retrieve a date for the given mensa ID, also check if the date string is correct!")
 		} else {
-			fmt.Println(requests.CanteenDateOpenedToString(date))
+			fmt.Println(requests.CanteenDateOpenedToString(date, canteen.Name, false))
 		}
 
 	case *showMensaWeekOpen == true:
@@ -115,7 +117,7 @@ func handleProgramFlags() {
 		if ok == false {
 			fmt.Println("Could not retrieve information about the next 7 days of your mensa! Maybe check if the mensa ID is correct...")
 		} else {
-			fmt.Println(requests.CanteenDateListToString(week))
+			fmt.Println(requests.CanteenDateListToString(week, canteen.Name))
 		}
 
 	default:

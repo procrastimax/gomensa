@@ -95,8 +95,14 @@ func CanteenMealWeekListToString(cateenWeek []CanteenDate, mealweek [][]CanteenM
 }
 
 //CanteenDateOpenedToString returns a string date representation of a canteen date with its opening information
-func CanteenDateOpenedToString(canteenDate *CanteenDate) string {
+func CanteenDateOpenedToString(canteenDate *CanteenDate, canteenName string, showWeek bool) string {
 	builder := strings.Builder{}
+
+	if showWeek == false && len(canteenName) > 1 {
+		builder.WriteString(canteenName)
+		builder.WriteString(" is open or closed on the following date:\n")
+	}
+
 	builder.WriteString(" - " + canteenDate.Date)
 	if canteenDate.Closed {
 		builder.WriteString(" -> closed")
@@ -107,11 +113,14 @@ func CanteenDateOpenedToString(canteenDate *CanteenDate) string {
 }
 
 //CanteenDateListToString returns a prettified version of a list of canteen dates
-func CanteenDateListToString(canteenDates []CanteenDate) string {
+func CanteenDateListToString(canteenDates []CanteenDate, canteenName string) string {
 	builder := strings.Builder{}
 
+	builder.WriteString(canteenName)
+	builder.WriteString(" is open or closed on the following dates:\n")
+
 	for _, date := range canteenDates {
-		builder.WriteString(CanteenDateOpenedToString(&date) + "\n")
+		builder.WriteString(fmt.Sprintf("\t%s\n", CanteenDateOpenedToString(&date, "", false)))
 	}
 	return builder.String()
 }
