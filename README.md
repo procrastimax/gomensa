@@ -17,7 +17,8 @@ A command line tool written in go to look up what's your mensa is offering today
   - notes
 
 ## How To Use
-Currently this program can only be controlled and executed with some program parameters.
+When you want to use the program more interactively, then just don't pass any parameters and the program shows you a list of available commands.
+
 For viewing all currently supported parameters call `--help`.
 
 Most parameters dont expect any values and just work as flags for viewing more informations.
