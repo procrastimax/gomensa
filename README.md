@@ -1,5 +1,6 @@
 # gomensa
 A command line tool written in go to look up what's your mensa is offering today. Based on the [openmensa](https://openmensa.org "openmensa website") project.
+Mensa is the german/dutch word for canteen/ cafeteria ;)
 
 ## Features
 - list all mensas from the openmensa project
