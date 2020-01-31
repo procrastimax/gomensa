@@ -15,6 +15,11 @@ A command line tool written in go to look up what's your mensa is offering today
   - price (student/ pupil/ employee/ other)
   - category
   - notes
+  
+## How To Install
+Gomensa is successfully tested on Windows10 and Linux (Ubuntu).
+In an existing 'go' environment just clone this repo into your '/src' folder and create a local binary with `go build` or a system-wide binary with `go install` (this install the binary into the '/bin' directory of your go-setup).  
+If you don't have an existing go-environment please read: [golang-doc](https://golang.org/doc/install "Installation").
 
 ## How To Use
 When you want to use the program more interactively, then just don't pass any parameters and the program shows you a list of available commands.
