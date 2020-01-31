@@ -8,14 +8,14 @@ import (
 
 //CanteenToString returns a human readable string for a single canteen instance
 func CanteenToString(canteen *Canteen) string {
-	return fmt.Sprintf("\tID: %d\n\tName: %s\n\tCity: %s\n\tAddress: %s\n", canteen.ID, canteen.Name, canteen.City, canteen.Address)
+	return fmt.Sprintf("ID: %d\n\tName: %s\n\tCity: %s\n\tAddress: %s\n", canteen.ID, canteen.Name, canteen.City, canteen.Address)
 }
 
 //CanteenListToString returns a human readable string for a list of canteens
 func CanteenListToString(canteens []Canteen) string {
 	builder := strings.Builder{}
 	for _, canteen := range canteens {
-		builder.WriteString(CanteenToString(&canteen))
+		builder.WriteString(CanteenToString(&canteen) + "\n")
 	}
 	return builder.String()
 }
