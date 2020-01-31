@@ -106,7 +106,9 @@ func CanteenMealListToString(canteenDate CanteenDate, meals []CanteenMeal, cante
 func CanteenMealWeekListToString(canteenWeek []CanteenDate, mealweek [][]CanteenMeal, canteen *Canteen, showPrice, showNotes, showCategory, showOnlyStudent, showOnlyEmployees, showOnlyOthers, showOnlyPupils bool) string {
 	builder := strings.Builder{}
 
-	builder.WriteString(fmt.Sprintf("%s meals for dates: %s - %s\n", canteen.Name, canteenWeek[0].Date, canteenWeek[len(canteenWeek)-1].Date))
+	if len(canteenWeek) > 0 {
+		builder.WriteString(fmt.Sprintf("%s meals for dates: %s - %s\n", canteen.Name, canteenWeek[0].Date, canteenWeek[len(canteenWeek)-1].Date))
+	}
 
 	for i := range mealweek {
 		if i == 0 {
@@ -126,7 +128,7 @@ func CanteenMealWeekListToString(canteenWeek []CanteenDate, mealweek [][]Canteen
 func CanteenDateOpenedToString(canteenDate *CanteenDate, canteenName string, showWeek bool) string {
 	builder := strings.Builder{}
 
-	if showWeek == false && len(canteenName) > 1 {
+	if showWeek == false && len(canteenName) > 1 && len(canteenDate.Date) > 1 {
 		builder.WriteString(canteenName)
 		builder.WriteString(" is open or closed on the following date:\n")
 	}

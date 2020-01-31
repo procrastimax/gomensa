@@ -40,7 +40,7 @@ func RequestCanteenDateTomorrow(ID uint32) (*CanteenDate, bool) {
 //RequestCanteenDateToday calls the requestDatesOfCanteen function with the limit of 1 and no startDate, so we retrieve the current date as a canteen date
 func RequestCanteenDateToday(ID uint32) (*CanteenDate, bool) {
 	canteenDay := requestDatesOfCanteen(ID, "", 0, 1)
-	if canteenDay == nil {
+	if canteenDay == nil || len(canteenDay) == 0 {
 		return &CanteenDate{}, false
 	}
 	return &canteenDay[0], true
