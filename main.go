@@ -77,6 +77,10 @@ func handleProgramFlags() {
 	canteenID := -1
 	var canteen *requests.Canteen = &requests.Canteen{}
 
+	if *defaultCanteen > 0 {
+		canteenID = *defaultCanteen
+	}
+
 	//if no canteenID is set then use the one from the config
 	if *canteenIDParam <= 0 {
 		canteenID = configutil.ReadConfig().Canteen.ID
@@ -150,5 +154,7 @@ func setDefaultCanteen(canteenID int) {
 
 	if ok == false {
 		log.Fatalln("Something went wrong when trying to set your default mensa and save it to the configuration file!")
+	} else {
+		fmt.Println("Successfully saved your default mensa!")
 	}
 }

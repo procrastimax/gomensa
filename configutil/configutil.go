@@ -56,7 +56,7 @@ func SaveConfig(config *Config) bool {
 //ReadConfig reads the config file from the .config/gomensa/ directory, returns nil when the directory/ config file does not exist
 func ReadConfig() *Config {
 	if CheckConfigExists() == false {
-		log.Println("ERROR: Can't read config file because file does not exist!")
+		log.Println("Can't read config file because file does not exist!")
 		log.Println("Using empty config file.")
 		SaveConfig(&Config{})
 		return &Config{}
