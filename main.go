@@ -335,7 +335,7 @@ func handleProgramFlags() {
 	var canteen *requests.Canteen = &requests.Canteen{}
 
 	if *defaultCanteen > 0 {
-		canteenID = *defaultCanteen
+		*canteenIDParam = *defaultCanteen
 	}
 
 	//if no canteenID is set then use the one from the config
