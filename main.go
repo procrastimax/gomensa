@@ -78,6 +78,10 @@ func handleProgramLoop() {
 				fmt.Println("Could not read the needed mensa ID to set your default mensa!")
 				break
 			}
+			if mensaID < 1 {
+				fmt.Println("Please only use a mensaID greater than 0!")
+				break
+			}
 			setDefaultCanteen(mensaID)
 		case strings.Contains(userCommand, "showMensa"):
 			splitArr := anyWhiteSpaceRegex.Split(userCommand, -1)
@@ -96,6 +100,11 @@ func handleProgramLoop() {
 				mensaID, err := strconv.Atoi(splitArr[1])
 				if err != nil {
 					fmt.Println("Could not read mensaID! Please use the following format: showMensa [mensaID]. Where mensaID is a normal positive number.")
+					break
+				}
+				if mensaID < 1 {
+					fmt.Println("Please only use a mensaID greater than 0!")
+					break
 				}
 				fmt.Println(requests.CanteenToString(requests.RequestCanteenByID(uint32(mensaID))))
 			}
@@ -118,6 +127,11 @@ func handleProgramLoop() {
 				mensaID, err := strconv.Atoi(splitArr[1])
 				if err != nil {
 					fmt.Println("Could not read mensaID! Please use the following format: showMensa [mensaID]. Where mensaID is a normal positive number.")
+					break
+				}
+				if mensaID < 1 {
+					fmt.Println("Please only use a mensaID greater than 0!")
+					break
 				}
 				mensa := requests.RequestCanteenByID(uint32(mensaID))
 				date, meals := requests.RequestCanteenMealOfToday(uint32(mensaID))
@@ -141,6 +155,11 @@ func handleProgramLoop() {
 				mensaID, err := strconv.Atoi(splitArr[1])
 				if err != nil {
 					fmt.Println("Could not read mensaID! Please use the following format: showMensa [mensaID]. Where mensaID is a normal positive number.")
+					break
+				}
+				if mensaID < 1 {
+					fmt.Println("Please only use a mensaID greater than 0!")
+					break
 				}
 				mensa := requests.RequestCanteenByID(uint32(mensaID))
 				date, meals := requests.RequestCanteenMealOfTomorrow(uint32(mensaID))
@@ -164,6 +183,11 @@ func handleProgramLoop() {
 				mensaID, err := strconv.Atoi(splitArr[1])
 				if err != nil {
 					fmt.Println("Could not read mensaID! Please use the following format: showMensa [mensaID]. Where mensaID is a normal positive number.")
+					break
+				}
+				if mensaID < 1 {
+					fmt.Println("Please only use a mensaID greater than 0!")
+					break
 				}
 				mensa := requests.RequestCanteenByID(uint32(mensaID))
 				dates, meals := requests.RequestCanteenMealsOfWeek(uint32(mensaID))
@@ -206,6 +230,10 @@ func handleProgramLoop() {
 					}
 					//mensaID was given, but no date, so use cantenDate from today
 				} else {
+					if mensaID < 1 {
+						fmt.Println("Please only use a mensaID greater than 0!")
+						break
+					}
 					date, _ := requests.RequestCanteenDateToday(uint32(mensaID))
 					mensa := requests.RequestCanteenByID(uint32(mensaID))
 					fmt.Println(requests.CanteenDateOpenedToString(date, mensa.Name, false))
@@ -232,6 +260,10 @@ func handleProgramLoop() {
 					}
 					//valid mensaID
 				} else {
+					if mensaID < 1 {
+						fmt.Println("Please only use a mensaID greater than 0!")
+						break
+					}
 					date, _ := requests.RequestCanteenDate(uint32(mensaID), dateStr)
 					mensa := requests.RequestCanteenByID(uint32(mensaID))
 					fmt.Println(requests.CanteenDateOpenedToString(date, mensa.Name, false))
