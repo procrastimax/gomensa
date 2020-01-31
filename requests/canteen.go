@@ -2,6 +2,7 @@ package requests
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -80,6 +81,17 @@ func RequestListOfAllCanteens() []Canteen {
 
 //requestCanteens makes a GET request to the openmensa endpoint and returns a list of all canteens
 func requestCanteens(page int, canteensChan chan<- []Canteen) {
+	// recover from the panic: send on closed channel
+	// this is kinda hacky, but so we dont confuse the user with a totally valid error message
+	defer func() {
+		if r := recover(); r != nil {
+			//only panic when we encounter an unknown panic
+			if fmt.Sprintf("%v", r) != "send on closed channel" {
+				log.Fatalln(r)
+			}
+		}
+	}()
+
 	baseURL, err := url.Parse(openMensaEndpoint)
 	if err != nil {
 		log.Println("ERROR: Malformed URL ", err.Error())
