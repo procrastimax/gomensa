@@ -26,14 +26,14 @@ func handleProgramFlags() {
 	var canteenIDParam = flag.Int("mensaID", -1, "Represents the specific and unique ID of your mensa. If you set this, it is going to be saved for future program useage as your default mensa.")
 	flag.IntVar(canteenIDParam, "mID", -1, "See 'mensaID'")
 
-	var defaultCanteen = flag.Int("defaultMensa", -1, "Represents your default canteen. This value is going to be saved for later requests in .config/gomensa/.")
+	var defaultCanteen = flag.Int("defaultMensa", -1, "Set this value with a mensaID and the mensa with this ID is your going to be saved as your default mensa for future requests in '.config/gomensa/'.")
 	flag.IntVar(defaultCanteen, "dm", -1, "See 'defaultMensa'")
 
 	var printAllCanteens = flag.Bool("listMensas", false, "Advises the program to print all avaible canteens.")
 	flag.BoolVar(printAllCanteens, "lm", false, "See 'listMensas'")
 
-	var printDefaultCanteen = flag.Bool("showDefaultMensa", false, "Show information about the current selected default mensa.")
-	flag.BoolVar(printDefaultCanteen, "sdm", false, "See 'showDefaultMensa'")
+	var printMensa = flag.Bool("showMensa", false, "Show basic information about the specified mensa. If no mensa was specified with 'mensaID', then your default mensa is printed.")
+	flag.BoolVar(printMensa, "sm", false, "See 'showMensa'")
 
 	var getTodayMeal = flag.Bool("mealToday", false, "If this is set to true, you get the meal of the current day. This uses the canteenID flag, or you need to set your default canteen with defaultCanteen!")
 	flag.BoolVar(getTodayMeal, "todm", false, "See 'mealToday'")
@@ -99,9 +99,8 @@ func handleProgramFlags() {
 	case *printAllCanteens == true:
 		fmt.Println(requests.CanteenListToString(requests.RequestListOfAllCanteens()))
 
-	case *printDefaultCanteen == true:
-		defaultCanteen := &configutil.ReadConfig().Canteen
-		fmt.Println(requests.CanteenToString(defaultCanteen))
+	case *printMensa == true:
+		fmt.Println(requests.CanteenToString(canteen))
 
 	case *getTodayMeal == true:
 		date, meals := requests.RequestCanteenMealOfToday(uint32(canteenID))
