@@ -29,38 +29,63 @@ func notesToString(notes []string) string {
 	return builder.String()
 }
 
-func priceToString(price prices, showOnlyStudent bool, seperator string) string {
+func priceToString(price prices, showOnlyStudent bool, showOnlyEmployees bool, showOnlyOthers bool, showOnlyPupils bool, seperator string) string {
 	builder := strings.Builder{}
+
 	if showOnlyStudent == true {
-		builder.WriteString("Price:\n")
+		builder.WriteString("\n\tPrice:\n")
 		builder.WriteString(fmt.Sprintf("\t\t- students: %0.2f€", price.Students))
+		return builder.String()
+
+	} else if showOnlyEmployees == true {
+		builder.WriteString("\n\tPrice:\n")
+		builder.WriteString(fmt.Sprintf("\t\t- employees: %0.2f€", price.Employees))
+		return builder.String()
+
+	} else if showOnlyOthers == true {
+		builder.WriteString("\n\tPrice:\n")
+		builder.WriteString(fmt.Sprintf("\t\t- others: %0.2f€", price.Others))
+		return builder.String()
+
+	} else if showOnlyPupils == true {
+		builder.WriteString("\n\tPrice:\n")
+		builder.WriteString(fmt.Sprintf("\t\t- pupils: %0.2f€", price.Pupils))
 		return builder.String()
 	}
 
-	builder.WriteString("Prices:\n")
+	builder.WriteString("\n\tPrices:\n")
 	builder.WriteString(fmt.Sprintf("\t\t- students: %0.2f€\n", price.Students))
-	builder.WriteString(fmt.Sprintf("\t\t- pupils: %0.2f€\n", price.Pupils))
+
+	//only show pupils value, when its not 0
+	if price.Pupils != 0.0 {
+		builder.WriteString(fmt.Sprintf("\t\t- pupils: %0.2f€\n", price.Pupils))
+	}
+
 	builder.WriteString(fmt.Sprintf("\t\t- employees: %0.2f€\n", price.Employees))
 	builder.WriteString(fmt.Sprintf("\t\t- others: %0.2f€\n", price.Others))
 	return builder.String()
 }
 
 //CanteenMealToString returns a human readable string for a single canteenmeal instance
-func CanteenMealToString(meal *CanteenMeal, seperator string, showPrice bool, showCategory bool, showNotes bool, showOnlyStudent bool) string {
+func CanteenMealToString(meal *CanteenMeal, showPrice bool, showCategory bool, showNotes bool, showOnlyStudent bool, showOnlyEmployees bool, showOnlyOthers bool, showOnlyPupils bool) string {
 	builder := strings.Builder{}
 
-	builder.WriteString(fmt.Sprintf("Meal: %s", meal.Name) + seperator)
+	builder.WriteString(fmt.Sprintf("Meal: %s", meal.Name))
 
 	if showCategory {
-		builder.WriteString(fmt.Sprintf("\n\tCategorie: %s", meal.Category) + seperator)
+		if !showNotes && !showPrice {
+			builder.WriteString(fmt.Sprintf("\n\tCategorie:\n\t\t- %s\n", meal.Category))
+		} else {
+			builder.WriteString(fmt.Sprintf("\n\tCategorie:\n\t\t- %s", meal.Category))
+		}
 	}
 
 	if showNotes {
-		builder.WriteString(fmt.Sprintf("\n\tNotes:\n%s", notesToString(meal.Notes)) + seperator)
+		builder.WriteString(fmt.Sprintf("\n\tNotes:\n%s", notesToString(meal.Notes)))
 	}
 
 	if showPrice {
-		builder.WriteString(fmt.Sprintf("%s", priceToString(meal.Prices, showOnlyStudent, " ")))
+		builder.WriteString(fmt.Sprintf("%s", priceToString(meal.Prices, showOnlyStudent, showOnlyEmployees, showOnlyOthers, showOnlyPupils, " ")))
 	}
 
 	builder.WriteString("\n")
@@ -68,27 +93,30 @@ func CanteenMealToString(meal *CanteenMeal, seperator string, showPrice bool, sh
 }
 
 //CanteenMealListToString returns a human readable string for a list if canteenmeals
-func CanteenMealListToString(canteenDate CanteenDate, meals []CanteenMeal, showPrice, showNotes, showCategory, showOnlyStudent bool) string {
+func CanteenMealListToString(canteenDate CanteenDate, meals []CanteenMeal, canteen *Canteen, showPrice, showNotes, showCategory, showOnlyStudent bool, showOnlyEmployees bool, showOnlyOthers bool, showOnlyPupils bool) string {
 	builder := strings.Builder{}
-	builder.WriteString(canteenDate.Date + "\n")
+	builder.WriteString(fmt.Sprintf("%s meals for date: %s:\n", canteen.Name, canteenDate.Date))
 	for i, meal := range meals {
-		builder.WriteString(strconv.Itoa(i+1) + " " + CanteenMealToString(&meal, "\t", showPrice, showCategory, showNotes, showOnlyStudent) + "\n")
+		builder.WriteString(strconv.Itoa(i+1) + " " + CanteenMealToString(&meal, showPrice, showCategory, showNotes, showOnlyStudent, showOnlyEmployees, showOnlyOthers, showOnlyPupils))
 	}
 	return builder.String()
 }
 
 //CanteenMealWeekListToString returns a human readable string for a whole week of meals
-func CanteenMealWeekListToString(cateenWeek []CanteenDate, mealweek [][]CanteenMeal, showPrice, showNotes, showCategory, showOnlyStudent bool) string {
+func CanteenMealWeekListToString(canteenWeek []CanteenDate, mealweek [][]CanteenMeal, canteen *Canteen, showPrice, showNotes, showCategory, showOnlyStudent, showOnlyEmployees, showOnlyOthers, showOnlyPupils bool) string {
 	builder := strings.Builder{}
+
+	builder.WriteString(fmt.Sprintf("%s meals for dates: %s - %s\n", canteen.Name, canteenWeek[0].Date, canteenWeek[len(canteenWeek)-1].Date))
+
 	for i := range mealweek {
 		if i == 0 {
-			builder.WriteString("-> " + cateenWeek[i].Date + "\n")
+			builder.WriteString("-> " + canteenWeek[i].Date + ":\n")
 		} else {
-			builder.WriteString("\n-> " + cateenWeek[i].Date + "\n")
+			builder.WriteString("\n-> " + canteenWeek[i].Date + ":\n")
 		}
 
-		for _, meal := range mealweek[i] {
-			builder.WriteString(fmt.Sprintf("\t%s\n", CanteenMealToString(&meal, "\t", showPrice, showCategory, showNotes, showOnlyStudent)))
+		for j, meal := range mealweek[i] {
+			builder.WriteString(fmt.Sprintf("%d %s", j+1, CanteenMealToString(&meal, showPrice, showCategory, showNotes, showOnlyStudent, showOnlyEmployees, showOnlyOthers, showOnlyPupils)))
 		}
 	}
 	return builder.String()

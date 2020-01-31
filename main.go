@@ -48,7 +48,16 @@ func handleProgramFlags() {
 	flag.BoolVar(showPrice, "p", false, "See 'price'")
 
 	var showOnlyStudent = flag.Bool("priceStudent", false, "When this flag is set, only the price for students is shown")
-	flag.BoolVar(showOnlyStudent, "pstud", false, "See 'priceStudent'")
+	flag.BoolVar(showOnlyStudent, "pStud", false, "See 'priceStudent'")
+
+	var showOnlyPupils = flag.Bool("pricePupil", false, "When this flag is set, only the price for pupils is shown")
+	flag.BoolVar(showOnlyPupils, "pPupil", false, "See 'pricePupil'")
+
+	var showOnlyEmployees = flag.Bool("priceEmployee", false, "When this flag is set, only the price for employees is shown")
+	flag.BoolVar(showOnlyEmployees, "pEmpl", false, "See 'priceEmployee'")
+
+	var showOnlyOther = flag.Bool("priceOther", false, "When this flag is set, only the price for 'others' is shown")
+	flag.BoolVar(showOnlyOther, "pOther", false, "See 'priceOther'")
 
 	var showCategory = flag.Bool("category", false, "Indicates whether the category of the meals should also be printed.")
 	flag.BoolVar(showCategory, "c", false, "See 'category'")
@@ -58,6 +67,7 @@ func handleProgramFlags() {
 
 	var showMensaDateOpen = flag.String("isOpen", "", "Set this flag to a date value in the format: YYYY-MM-DD and information about the opening status of the mensa is shown.")
 	var showMensaWeekOpen = flag.Bool("weekOpen", false, "Shows a list of the next 7 days from your default or specified mensa and if the mensa is opened on these days.")
+
 	flag.Parse()
 
 	if flag.Parsed() == false {
@@ -80,6 +90,11 @@ func handleProgramFlags() {
 		canteen = requests.RequestCanteenByID(uint32(canteenID))
 	}
 
+	//when one of the price specifier is set, then the showPrice value should also be true
+	if *showOnlyStudent || *showOnlyEmployees || *showOnlyOther || *showOnlyPupils {
+		*showPrice = true
+	}
+
 	switch {
 	case *printAllCanteens == true:
 		fmt.Println(requests.CanteenListToString(requests.RequestListOfAllCanteens()))
@@ -90,15 +105,15 @@ func handleProgramFlags() {
 
 	case *getTodayMeal == true:
 		date, meals := requests.RequestCanteenMealOfToday(uint32(canteenID))
-		fmt.Println(requests.CanteenMealListToString(*date, meals, *showPrice, *showNotes, *showCategory, *showOnlyStudent))
+		fmt.Println(requests.CanteenMealListToString(*date, meals, canteen, *showPrice, *showNotes, *showCategory, *showOnlyStudent, *showOnlyEmployees, *showOnlyOther, *showOnlyPupils))
 
 	case *getTomorrowMeal == true:
 		date, meal := requests.RequestCanteenMealOfTomorrow(uint32(canteenID))
-		fmt.Println(requests.CanteenMealListToString(*date, meal, *showPrice, *showNotes, *showCategory, *showOnlyStudent))
+		fmt.Println(requests.CanteenMealListToString(*date, meal, canteen, *showPrice, *showNotes, *showCategory, *showOnlyStudent, *showOnlyEmployees, *showOnlyOther, *showOnlyPupils))
 
 	case *getWeekMeal == true:
 		canteenWeek, canteenMealWeek := requests.RequestCanteenMealsOfWeek(uint32(canteenID))
-		fmt.Println(requests.CanteenMealWeekListToString(canteenWeek, canteenMealWeek, *showPrice, *showNotes, *showCategory, *showOnlyStudent))
+		fmt.Println(requests.CanteenMealWeekListToString(canteenWeek, canteenMealWeek, canteen, *showPrice, *showNotes, *showCategory, *showOnlyStudent, *showOnlyEmployees, *showOnlyOther, *showOnlyPupils))
 
 	case *defaultCanteen > 0:
 		setDefaultCanteen(*defaultCanteen)
@@ -123,10 +138,6 @@ func handleProgramFlags() {
 	default:
 		log.Println("Did not specify any flag! Doing nothing.")
 	}
-}
-
-func getDefaultCanteenIDFromConfig() int {
-	return configutil.ReadConfig().Canteen.ID
 }
 
 func setDefaultCanteen(canteenID int) {
