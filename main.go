@@ -87,7 +87,10 @@ func handleProgramFlags() {
 		canteen = &configutil.ReadConfig().Canteen
 		//canteenID is always the n 0 after reading from config, when the config did not exist previously
 		if canteenID == 0 {
-			log.Fatalln("No mensaID was given and no defaultID exist in the config files! Please set either one of them!")
+			// sepcial case: no IDs were set/ saved, but the user wants to list all mensas, then we dont need a special mensa ID
+			if *printAllCanteens == false {
+				log.Fatalln("No mensaID was given and no defaultID exist in the config files! Please set either one of them!")
+			}
 		}
 	} else {
 		canteenID = *canteenIDParam
