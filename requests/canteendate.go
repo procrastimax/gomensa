@@ -31,7 +31,7 @@ type CanteenDate struct {
 //RequestCanteenDateTomorrow calls the requestDatesOfCanteen function with the limit = 1, a page = 2 and no startDate, so we retrieve the canteen date of tomorrow
 func RequestCanteenDateTomorrow(ID uint32) (*CanteenDate, bool) {
 	canteenDay := requestDatesOfCanteen(ID, "", 2, 1)
-	if canteenDay == nil {
+	if canteenDay == nil || len(canteenDay) == 0 {
 		return &CanteenDate{}, false
 	}
 	return &canteenDay[0], true
@@ -61,7 +61,7 @@ func RequestCanteenDate(ID uint32, date string) (*CanteenDate, bool) {
 func RequestCanteenWeek(ID uint32) ([]CanteenDate, bool) {
 	canteenWeek := requestDatesOfCanteen(ID, "", 0, 7)
 	//when a nil slice was passed, it is most likely an error occured, so we return a false ok value
-	if canteenWeek == nil {
+	if canteenWeek == nil || len(canteenWeek) == 0 {
 		return []CanteenDate{}, false
 	}
 	return canteenWeek, true
