@@ -31,21 +31,21 @@ func TestRequestCanteenByID(t *testing.T) {
 }
 
 func TestVariousCanteenDates(t *testing.T) {
-	canteenWeek := requests.RequestCanteenWeek(32)
+	canteenWeek, _ := requests.RequestCanteenWeek(32)
 	if len(canteenWeek) == 0 {
 		t.Error("Something went wrong, we sould definetly retrieve a week of canteen dates here!")
 	} else {
 		fmt.Println(canteenWeek)
 	}
 
-	canteenDay := requests.RequestCanteenDateToday(32)
+	canteenDay, _ := requests.RequestCanteenDateToday(32)
 	if len(canteenDay.Date) == 0 {
 		t.Error("Something went wrong, we sould definetly retrieve a canteenDate for today!")
 	} else {
 		fmt.Println(*canteenDay)
 	}
 
-	canteenDay = requests.RequestCanteenDateTomorrow(32)
+	canteenDay, _ = requests.RequestCanteenDateTomorrow(32)
 	if len(canteenDay.Date) == 0 {
 		t.Error("Something went wrong, we sould definetly retrieve a canteenDate for tomorrow!")
 	} else {
