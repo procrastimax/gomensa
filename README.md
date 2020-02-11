@@ -16,10 +16,10 @@ Mensa is the german/dutch word for canteen/ cafeteria ;)
   - price (student/ pupil/ employee/ other)
   - category
   - notes
-  
+
 ## How To Install
 Gomensa is successfully tested on Windows10 and Linux (Ubuntu).
-In an existing 'go' environment just clone this repo into your '/src' folder and create a local binary with `go build` or a system-wide binary with `go install` (this install the binary into the '/bin' directory of your go-setup).  
+In an existing 'go' environment just clone this repo into your '/src' folder and create a local binary with `go build` or a system-wide binary with `go install` (this install the binary into the '/bin' directory of your go-setup).
 If you don't have an existing go-environment please read: [golang-doc](https://golang.org/doc/install "Installation").
 
 ## How To Use
@@ -36,8 +36,8 @@ Also there exists a short form for almost all parameters so f.e. instead of writ
 ### List All Mensas
 It is advised to first retrieve a list of all mensas available by `--listMensas`.
 With this command you will get a list of all mensas with their ID.
-With the unix program `grep` you can find the mensa you want.  
-F.e. `gomensa --listMensas | grep Leipzig` will print out all mensas which contain 'Leipzig' in their name. You have to look for the ID. The mensaID is the unique specifier for all mensas.
+With the unix program `grep` you can find the mensa you want.
+F.e. `gomensa --listMensas | grep Leipzig -C 3` will print out all mensas which contain 'Leipzig' in their name. You have to look for the ID. The mensaID is the unique specifier for all mensas.
 
 ### Set Default Mensa
 For the 'Mensa am Park' in Leipzig the mensaID is 63. So when you want to save it as your default mensa use `gomensa --defaultMensa 63`. Now this mensa is saved under ~/.config/gomensa and all requests in the future, in which you did not specify any mensaID value, this default mensa is going to be used.
@@ -65,5 +65,5 @@ This prints out all information about meals for today.
 You can also check if your mensa is opened on a special date or in the week.
 F.e. `gomensa --mensaID 31 --weekOpen` prints a list with dates of the next couple days specifying whether or not the mensa with ID 31 is opened.
 For checking a special date you need the format: YYYY-MM-DD!
-F.e. `gomensa --isOpen 2020-01-31` gives information if your default mensa is opened on the 31. January 2020.  
+F.e. `gomensa --isOpen 2020-01-31` gives information if your default mensa is opened on the 31. January 2020.
 For most mensas the opening status is only known for the next couple of dates. So I doubt you could check if the mensa was opened in 1970 or something like this.
